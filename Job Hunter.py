@@ -92,20 +92,17 @@ def main():
             )
         )
 
-        # Agent 3: Reviewer
+        # Agent 4: Reviewer
         reviewer = Agent(
             role="Resume Reviewer",
             goal="Review a given resume and notify the Resume Strategist of any time gaps between positions on the resume. ",
-            backstory="You are an expert at reviewing resumes "
-                    "for the Resume Strategist. "
-                    "Your goal is to review the resume "
-                    "to ensure that it follows resume writing best practices.",
-            tools = [read_resume, semantic_search_resume,search_tool],
+            backstory="You are an expert at reviewing resumes to make sure there are now time gaps.",
+            tools = [read_resume, semantic_search_resume],
             verbose=True,
             max_iter=5
         )
 
-        # Agent 4: Resume Strategist
+        # Agent 3: Resume Strategist
         resume_strategist = Agent(
             role="Resume Strategist for Engineers",
             goal="Following resume writing best practices, highlight the most "
@@ -157,8 +154,8 @@ def main():
 
         edit_task = Task(
             description=("Utilize tools to identify the chronoligcal job history for the given resume and "
-                        "make sure there are no gaps. You will check for grammatical errors as well."),
-            expected_output="The correct chronological order of the job history and a list of of grammatical errors that should be corrected.",   
+                        "make sure there are no gaps."),
+            expected_output="A job history list of all the postions on the resume in chronologuical order.",   
             agent=reviewer,
             async_execution=True
         )
@@ -166,40 +163,25 @@ def main():
         # Task for Resume Strategist Agent: Align Resume with Job Requirements
         resume_strategy_task = Task(
             description=(
-                "Using the profile, job requirements, job history, and grammatical errors obtained from "
+                "Using the profile, job requirements, and job history list obtained from "
                 "previous tasks, tailor the resume to highlight the most "
                 "relevant areas. Employ tools to adjust and enhance the "
                 "resume content. Make sure this is the best resume ever but "
                 "don't make up any information. You must review and update every section, "
                 "inlcuding the initial summary, work experience, skills, "
-                "and education. Check the final resume to make sure that the experiences were not "
-                "copied verbatim from the original resume.  All to better reflect how the candidates "
+                "and education. Check the final resume to make sure that the experiences are summarized. Each "
+                "position has no more than three bullet points.  All to better reflect how the candidates "
                 "experiences and abilities match the job posting."
             ),
             expected_output=(
                 "An updated resume that effectively highlights and summarizes the candidate's "
-                "experiences and qualifications relevant to the job."
+                "experiences and qualifications relevant to the job.  The resume should be in markdown format."
             ),
             output_file="tailored_resume.md",
             context=[research_task, profile_task, edit_task],
             agent=resume_strategist
         )
 
-
-        job_application_crew = Crew(
-            agents=[researcher
-                    ,profiler
-                    ,reviewer
-                    ,resume_strategist],
-
-            tasks=[research_task
-                ,profile_task
-                ,edit_task
-                    ,resume_strategy_task],
-            verbose=True
-        )
-
-        # Create the Crew
         job_application_crew = Crew(
             agents=[researcher
                     ,profiler
@@ -234,7 +216,7 @@ def main():
         # This block catches any other exceptions that were not specifically handled above
         print(f"An unexpected error occurred: {e}")
 
-job_posting_url = 'https://docs.google.com/document/d/e/2PACX-1vT_hJQYGSJ9lj0-aO2zJeZx4d16JdvK_HMkZihS2FH-6hCv2Z6C7w0UH4Eb3I_wFGfhuFgNFvmi9tqd/pub'
+job_posting_url = 'https://velocityglobal.com/company/careers/velocityglobal/4376464006?gh_jid=4376464006'
 github_url = 'https://github.com/ecocarlisle/'
 
 if __name__ == "__main__":
